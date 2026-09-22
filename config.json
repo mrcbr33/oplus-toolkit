@@ -1,0 +1,9 @@
+{
+  "language": "it",
+  "theme": "dark",
+  "last_level": "light",
+  "last_action": "uninstall",
+  "dry_run": true,
+  "force_mode": false,
+  "window_geometry": "1200x780"
+}
