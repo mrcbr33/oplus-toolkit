@@ -1,0 +1,140 @@
+{
+  "schema_version": "3.0.0",
+  "last_updated": "2026-09-22",
+  "description": "Bloatware lists for Oppo, OnePlus, and Realme devices (OPlus/HeyTap codebase). Updated for ColorOS 16, Realme UI 7.0, and OxygenOS 16 (Android 16).",
+  "supported_uis": ["ColorOS", "OxygenOS", "Realme UI"],
+  "safety_levels": {
+    "light": "Safe to remove for all users. No impact on core functionality.",
+    "aggressive": "Advanced removal. May affect specific features. Backup required.",
+    "blacklist": "CRITICAL. DO NOT REMOVE. Will cause bootloop or brick."
+  },
+  "lists": {
+    "light": {
+      "description": "Safe and universal removal for all OPlus devices on Android 16.",
+      "packages": [
+        { "package": "com.android.email", "name": "Email", "reason": "Redundant, replaceable with Gmail or other email clients." },
+        { "package": "com.android.mms", "name": "Messages", "reason": "Redundant, replaceable with Google Messages." },
+        { "package": "com.android.mms.service", "name": "MMS Service", "reason": "Backend service for stock MMS app." },
+        { "package": "com.baidu.input_oppo", "name": "Baidu Keyboard (OPPO Edition)", "reason": "Redundant, replaceable with Gboard." },
+        { "package": "com.coloros.calendar", "name": "Calendar", "reason": "Redundant, replaceable with Google Calendar." },
+        { "package": "com.coloros.codebook", "name": "Password Manager", "reason": "Replaceable with Google Autofill or Bitwarden." },
+        { "package": "com.coloros.ocrscanner", "name": "OCR Scanner", "reason": "Accessory feature, rarely used." },
+        { "package": "com.coloros.operationManual", "name": "User Manual", "reason": "Useless bloat, available online." },
+        { "package": "com.coloros.sharescreen", "name": "Screen Sharing", "reason": "Accessory feature, rarely used." },
+        { "package": "com.heytap.cloud", "name": "HeyTap Cloud", "reason": "Replaceable with Google Drive or other cloud services." },
+        { "package": "com.heytap.music", "name": "HeyTap Music", "reason": "Redundant media player." },
+        { "package": "com.heytap.reader", "name": "HeyTap Reader", "reason": "Often unused reading app." },
+        { "package": "com.heytap.speechassist", "name": "Speech Assistant", "reason": "Redundant, replaceable with Google Assistant." },
+        { "package": "com.oneplus.backuprestore.remoteservice", "name": "OnePlus Backup Service", "reason": "Backend service, never seen running." },
+        { "package": "com.oneplus.bttestmode", "name": "Bluetooth Test Mode", "reason": "Developer testing tool, not needed by users." },
+        { "package": "com.oneplus.zen", "name": "Zen Mode", "reason": "Accessory focus mode, rarely used." },
+        { "package": "com.oplus.aimemory", "name": "AI Memory", "reason": "Accessory AI feature." },
+        { "package": "com.oplus.crashbox", "name": "CrashBox", "reason": "Crash reporting, non-essential for users." },
+        { "package": "com.oplus.qualityprotect", "name": "Quality Protect", "reason": "Non-essential service." },
+        { "package": "com.oplus.tai.borderpresearch", "name": "Border Pre-search", "reason": "Non-essential AI service." },
+        { "package": "com.realme.movieshot", "name": "Movie Shot", "reason": "Accessory feature, rarely used." },
+        { "package": "com.realme.wellbeing", "name": "Realme Wellbeing", "reason": "Redundant, replaceable with Google Digital Wellbeing." },
+        { "package": "cn.wps.moffice_eng", "name": "WPS Office", "reason": "Redundant, replaceable with other office suites." },
+        { "package": "com.microsoft.appmanager", "name": "Link to Windows", "reason": "Safe to remove if you don't sync with PC." },
+        { "package": "com.facebook.appmanager", "name": "Facebook App Manager", "reason": "Facebook bloat, not needed." },
+        { "package": "com.facebook.system", "name": "Facebook System", "reason": "Facebook bloat, not needed." }
+      ]
+    },
+    "aggressive": {
+      "description": "Advanced removal. May affect specific features. Always backup first.",
+      "packages": [
+        { "package": "com.heytap.browser", "name": "HeyTap Browser", "reason": "Replaceable with Chrome or Firefox." },
+        { "package": "com.heytap.market", "name": "App Market", "reason": "Replaceable with Play Store. Can be disabled instead." },
+        { "package": "com.heytap.themestore", "name": "Theme Store", "reason": "Non-essential customization app." },
+        { "package": "com.nearme.gamecenter", "name": "Game Center", "reason": "Non-essential gaming hub." },
+        { "package": "com.nearme.romupdate", "name": "ROM Update", "reason": "REMOVING DISABLES OTA UPDATES. Only remove if you never want system updates." },
+        { "package": "com.oplus.aiunit", "name": "AI Service Engine", "reason": "May disable AI-powered features." },
+        { "package": "com.coloros.accessibilityassistant", "name": "Accessibility Assistant", "reason": "REMOVING BREAKS ACCESSIBILITY FEATURES. Do not remove if you use them." },
+        { "package": "com.coloros.assistantscreen", "name": "Assistant Screen", "reason": "May remove the assistant screen and suggestions." },
+        { "package": "com.coloros.childrenspace", "name": "Children Space", "reason": "REMOVING BREAKS PARENTAL CONTROLS. Do not remove if you use them." },
+        { "package": "com.coloros.findmyphone", "name": "Find My Phone", "reason": "REMOVING DISABLES DEVICE TRACKING. Do not remove if you want to locate your phone." },
+        { "package": "com.oplus.pay", "name": "Oppo Pay", "reason": "REMOVING DISABLES OPPO PAY. Do not remove if you use it." },
+        { "package": "com.oppoex.afterservice", "name": "After-Sales Service", "reason": "Non-essential support app." },
+        { "package": "com.coloros.onekeylockscreen", "name": "One-Key Lock Screen", "reason": "Replaceable with other lock screen widgets." },
+        { "package": "com.oplus.aicall", "name": "AI Call", "reason": "Safe to delete if you don't want AI processing call recordings." },
+        { "package": "com.oplus.audio.effectcenter", "name": "Audio Effect Center", "reason": "Safe to remove if you don't use Dolby sound effects or equalizers." },
+        { "package": "com.oplus.omoji", "name": "Omoji", "reason": "Avatar engine for contacts. Safe to remove." },
+        { "package": "com.coloros.video", "name": "Video Player", "reason": "Replaceable with VLC or MX Player." },
+        { "package": "com.oplus.games", "name": "Game Center / Game Space", "reason": "Safe to remove if you don't need gaming overlays." },
+        { "package": "com.coloros.gamesettings", "name": "Game Assistant", "reason": "Safe to remove if you don't use game plugins." },
+        { "package": "com.oplus.beaconlink", "name": "BeaconLink", "reason": "Offline Bluetooth walkie-talkie. Gimmick unless your friends also use OPPO/OnePlus." },
+        { "package": "com.oplus.acc.gac", "name": "Smart Cloud Acceleration", "reason": "OPPO's paid VIP network boost service. Recommended to remove." },
+        { "package": "com.oplus.pantanal.ums", "name": "Ubiquitous Manager Service", "reason": "Required for Fluid Cloud (Dynamic Island clone). Advanced removal." },
+        { "package": "com.oplus.nas", "name": "NetworkAssistSys", "reason": "Has location & call log permissions. Can be disabled with no issues." },
+        { "package": "com.coloros.securepay", "name": "Secure Pay", "reason": "Safe to remove if you don't use Oppo's payment service." },
+        { "package": "com.coloros.scenemod", "name": "Simple Mode / Senior Mode", "reason": "Safe to remove if you don't use it." },
+        { "package": "com.coloros.eyeprotect", "name": "Eye Comfort Mode", "reason": "Safe to remove if you don't use the system reading mode." },
+        { "package": "com.coloros.gamespace", "name": "Game Space", "reason": "Safe to remove if you don't use gaming features." },
+        { "package": "com.coloros.musiclink", "name": "Music Link", "reason": "Accessory music sharing feature." },
+        { "package": "com.coloros.floatassistant", "name": "Floating Assistant", "reason": "Accessory floating window feature." },
+        { "package": "com.coloros.colordirectservice", "name": "ColorDirect Service", "reason": "Non-essential service." },
+        { "package": "com.coloros.oshare", "name": "OShare", "reason": "REMOVING BREAKS SHARE MENU. Do not remove if you use Realme Share." },
+        { "package": "com.heytap.htms", "name": "HeyTap Mobile Services", "reason": "HeyTap framework service. Safe to suspend." },
+        { "package": "com.heytap.openid", "name": "HeyTap OpenID", "reason": "Account authentication service. Safe to suspend." },
+        { "package": "com.nearme.instant.platform", "name": "NearMe Instant Platform", "reason": "Quick app platform. Safe to suspend." },
+        { "package": "com.tencent.soter.soterserver", "name": "Tencent Soter", "reason": "Tencent biometric service. Safe to suspend." },
+        { "package": "com.oplus.appdetail", "name": "App Detail", "reason": "Stock app installer. Safe to remove if using third-party installers." }
+      ]
+    },
+    "blacklist": {
+      "description": "CRITICAL. These packages MUST NOT be removed. Removal causes bootloop, brick, or loss of core functionality.",
+      "packages": [
+        { "package": "com.oplus.appplatform", "name": "App Services", "reason": "CAUSES BOOTLOOP. Related to Oppo's HeyTap account services. Provides RomUpdateService. Never remove." },
+        { "package": "com.heytap.appplatform", "name": "AppPlatform", "reason": "CAUSES BOOTLOOP. Related to Oppo's HeyTap account services." },
+        { "package": "com.android.systemui", "name": "System UI", "reason": "THE ENTIRE PHONE INTERFACE. Removing it makes the device unusable." },
+        { "package": "com.android.settings", "name": "Settings", "reason": "Without it, you cannot configure anything." },
+        { "package": "com.android.providers.settings", "name": "Settings Provider", "reason": "The system settings database. Removing corrupts configuration." },
+        { "package": "com.google.android.gms", "name": "Google Play Services", "reason": "Breaks all Google apps and many others." },
+        { "package": "com.android.phone", "name": "Phone", "reason": "Disables calls and mobile data." },
+        { "package": "com.android.nfc", "name": "NFC", "reason": "Breaks contactless payments and NFC functionality." },
+        { "package": "com.coloros.bootreg", "name": "Boot Registration", "reason": "CAUSES BOOTLOOP. Startup wizard. Never remove." },
+        { "package": "com.android.launcher3", "name": "System Launcher", "reason": "CAUSES BOOTLOOP. The home screen. Never remove." },
+        { "package": "com.coloros.weather.service", "name": "Weather Service", "reason": "CAUSES SCREEN FLICKER AND BRICK. Removing it corrupts the lock screen. Never remove." },
+        { "package": "com.android.providers.media", "name": "Media Provider", "reason": "Essential for many apps to access media files." },
+        { "package": "com.oplus.exsystemservice", "name": "ExSystemService", "reason": "CAUSES BOOTLOOP on Realme 10 4G and possibly other devices." },
+        { "package": "com.oplus.deepthinker", "name": "DeepThinker", "reason": "CAUSES BOOTLOOP. System intelligence service. Never remove." },
+        { "package": "com.coloros.safecenter", "name": "Security Center", "reason": "REMOVING BREAKS LOCKSCREEN. You may be unable to unlock your phone." },
+        { "package": "com.oplus.dfs", "name": "Dynamic Frame Service", "reason": "System-critical on some devices. Handle with extreme caution, test only if you have a backup." },
+        { "package": "com.oplus.eid", "name": "eID Service", "reason": "System-critical on some devices. Handle with extreme caution, test only if you have a backup." },
+        { "package": "com.oplus.wallpapers", "name": "System Wallpapers", "reason": "CAUSES BOOTLOOP on some Realme devices. Never remove." },
+        { "package": "com.heytap.quicksearchbox", "name": "Global Search (Breeno)", "reason": "Deeply integrated into system UI on ColorOS 16+. May cause instability." },
+        { "package": "com.heytap.pictorial", "name": "Lock Screen Magazine", "reason": "Deeply integrated into lock screen on ColorOS 16+. May cause issues." },
+        { "package": "com.coloros.securepay", "name": "Secure Pay", "reason": "System-critical on some ColorOS 16 builds. Use 'disable' instead of 'uninstall'." },
+        { "package": "com.coloros.findmyphone", "name": "Find My Phone", "reason": "System-critical on some ColorOS 16 builds. Use 'suspend' instead of 'uninstall'." }
+      ]
+    }
+  },
+  "notes": {
+    "light": [
+      "These packages are safe to remove on all OPlus devices (ColorOS 11+, OxygenOS 11+, Realme UI 2.0+).",
+      "Always create a backup before removing anything.",
+      "If a package is not present on your device, it will be skipped automatically."
+    ],
+    "aggressive": [
+      "Read each description carefully. Some packages affect specific features.",
+      "Use 'disable' instead of 'uninstall' for packages you might want back later.",
+      "Always create a backup before proceeding.",
+      "Some packages like com.oplus.pantanal.ums, com.oplus.dfs, and com.oplus.eid are borderline. Test them one at a time with a backup."
+    ],
+    "blacklist": [
+      "The app will prevent you from selecting these packages.",
+      "If you accidentally remove one, use ADB to restore it: adb shell cmd package install-existing <package_name>.",
+      "Some packages may require root to remove, but they should never be removed anyway."
+    ],
+    "coloros_16_specific": [
+      "ColorOS 16 has introduced stricter protection on certain system packages. Standard adb shell pm uninstall or disable-user commands may throw a SecurityException: Access denied error for some packages.",
+      "Packages like com.heytap.quicksearchbox, com.coloros.assistantscreen, com.heytap.browser, and com.heytap.pictorial may require root (Magisk/KernelSU) to be removed on ColorOS 16 China ROM.",
+      "For these stubborn packages, use 'suspend' or 'disable' commands if available. If not, they must be left alone."
+    ],
+    "oneplus_15_and_newer": [
+      "On OnePlus 15 (CPH2749, ColorOS V16) and similar new devices, specific privacy and telemetry packages have been identified and tested by the community.",
+      "The aggressive list includes these packages (com.oplus.pantanal.ums, com.oplus.nas, etc.) and they have been verified as safe to disable on these specific models.",
+      "Always verify on your specific device model before proceeding."
+    ]
+  }
+}
