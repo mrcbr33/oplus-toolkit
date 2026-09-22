@@ -93,47 +93,62 @@ class PreviewDialog(ctk.CTkToplevel):
         super().__init__(parent)
         self.t = t
         self.on_confirm = on_confirm
+        self._packages = packages
+        self._action = action
+        self._serial = serial
+        self._dry_run = dry_run
+
         self.title(t["prev_title"])
-        self.geometry("720x620")
-        self.minsize(600, 500)
+        self.geometry("780x700")
+        self.minsize(640, 520)
         self.configure(fg_color=BG_APP)
-        self.transient(parent)
-        self.grab_set()
 
-        # Header
-        header = ctk.CTkFrame(self, fg_color="transparent")
-        header.pack(fill="x", padx=25, pady=(20, 10))
+        # Build widgets after the window is mapped, to avoid rendering issues
+        # on Wayland / Hyprland / some CTk versions.
+        self.after(80, self._build)
 
+    def _build(self) -> None:
+        t = self.t
+        action = self._action
+        packages = self._packages
+        serial = self._serial
+        dry_run = self._dry_run
+
+        # Title
         ctk.CTkLabel(
-            header, text=t["prev_title"], font=FONT_H1, text_color=FG_PRIMARY
-        ).pack(anchor="w")
+            self, text=t["prev_title"], font=FONT_H1, text_color=FG_PRIMARY
+        ).pack(anchor="w", padx=25, pady=(20, 4))
+
+        # Subtitle
         ctk.CTkLabel(
-            header,
+            self,
             text=t["prev_subtitle"].format(
                 n=len(packages), action=action.value, serial=serial or "?"
             ),
             font=FONT_BODY,
             text_color=FG_SECONDARY,
-        ).pack(anchor="w", pady=(4, 0))
+        ).pack(anchor="w", padx=25, pady=(0, 12))
 
         # Warning banner
         if dry_run:
-            banner_color = "#1e3a5f"
-            banner_border = ACCENT
+            banner_bg = "#1e3a5f"
+            banner_fg = ACCENT
             banner_text = t["prev_dry_run_note"]
+            banner_icon = "i"
         else:
-            banner_color = "#3a1e1e"
-            banner_border = DANGER
+            banner_bg = "#3a1e1e"
+            banner_fg = DANGER
             banner_text = t["prev_warning_body"]
+            banner_icon = "!"
 
-        banner = ctk.CTkFrame(self, fg_color=banner_color, corner_radius=10)
-        banner.pack(fill="x", padx=25, pady=10)
+        banner = ctk.CTkFrame(self, fg_color=banner_bg, corner_radius=10)
+        banner.pack(fill="x", padx=25, pady=(0, 12))
 
         ctk.CTkLabel(
             banner,
-            text=("⚠ " if not dry_run else "ⓘ ") + t["prev_warning_title"],
+            text=f"[ {banner_icon} ]  {t['prev_warning_title']}",
             font=FONT_H3,
-            text_color=banner_border,
+            text_color=banner_fg,
         ).pack(anchor="w", padx=15, pady=(12, 4))
 
         ctk.CTkLabel(
@@ -141,43 +156,57 @@ class PreviewDialog(ctk.CTkToplevel):
             text=banner_text,
             font=FONT_BODY,
             text_color=FG_PRIMARY,
-            wraplength=640,
+            wraplength=680,
             justify="left",
+            anchor="w",
         ).pack(anchor="w", padx=15, pady=(0, 12))
 
-        # Commands
+        # Commands label
         ctk.CTkLabel(
             self,
             text=t["prev_commands"],
             font=FONT_H3,
             text_color=FG_SECONDARY,
-        ).pack(anchor="w", padx=25, pady=(10, 4))
+        ).pack(anchor="w", padx=25, pady=(4, 4))
+
+        # Commands box
+        verb_map = {
+            Action.UNINSTALL: "uninstall --user 0",
+            Action.DISABLE: "disable-user --user 0",
+            Action.ENABLE: "enable --user 0",
+            Action.RESTORE: "install-existing --user 0",
+        }
+        verb = verb_map.get(action, action.value)
+        commands = "\n".join(f"adb shell pm {verb} {pkg}" for pkg in packages)
 
         cmd_box = ctk.CTkTextbox(
-            self, font=FONT_MONO, fg_color=BG_INPUT, text_color=FG_PRIMARY
+            self,
+            font=FONT_MONO,
+            fg_color=BG_INPUT,
+            text_color=FG_PRIMARY,
+            border_color=BG_CARD_ALT,
+            border_width=1,
+            wrap="word",
+            height=220,
         )
-        cmd_box.pack(fill="both", expand=True, padx=25, pady=(0, 15))
-
-        verb = "uninstall --user 0" if action == Action.UNINSTALL else \
-               "disable-user --user 0" if action == Action.DISABLE else \
-               "enable --user 0" if action == Action.ENABLE else \
-               "install-existing --user 0"
-        lines = [f"adb shell pm {verb} {pkg}" for pkg in packages]
-        cmd_box.insert("1.0", "\n".join(lines))
+        cmd_box.pack(fill="both", expand=True, padx=25, pady=(0, 12))
+        cmd_box.insert("1.0", commands)
         cmd_box.configure(state="disabled")
 
-        # Ack checkbox
+        # Acknowledgement checkbox
         self.ack_var = tk.BooleanVar(value=False)
         ack = ctk.CTkCheckBox(
             self,
             text=t["prev_ack"],
             variable=self.ack_var,
             font=FONT_BODY,
+            text_color=FG_PRIMARY,
             command=self._toggle_confirm,
             fg_color=ACCENT,
             hover_color=ACCENT_HOVER,
+            checkmark_color=FG_PRIMARY,
         )
-        ack.pack(anchor="w", padx=25, pady=(0, 10))
+        ack.pack(anchor="w", padx=25, pady=(0, 12))
 
         # Buttons
         btn_row = ctk.CTkFrame(self, fg_color="transparent")
@@ -192,6 +221,7 @@ class PreviewDialog(ctk.CTkToplevel):
             text_color=FG_PRIMARY,
             height=38,
             width=120,
+            corner_radius=8,
         ).pack(side="right", padx=(10, 0))
 
         self.confirm_btn = ctk.CTkButton(
@@ -203,9 +233,20 @@ class PreviewDialog(ctk.CTkToplevel):
             text_color=FG_PRIMARY,
             height=38,
             width=140,
+            corner_radius=8,
             state="disabled",
         )
         self.confirm_btn.pack(side="right")
+
+        # After layout is done, take focus
+        self.after(120, self._post_build)
+
+    def _post_build(self) -> None:
+        try:
+            self.grab_set()
+            self.focus_force()
+        except Exception:
+            pass
 
     def _toggle_confirm(self) -> None:
         self.confirm_btn.configure(
@@ -222,29 +263,36 @@ class ResultsDialog(ctk.CTkToplevel):
 
     def __init__(self, parent, t: dict, result: BatchResult) -> None:
         super().__init__(parent)
+        self.t = t
+        self._result = result
+
         self.title(t["res_title"])
-        self.geometry("760x520")
+        self.geometry("780x540")
         self.minsize(600, 400)
         self.configure(fg_color=BG_APP)
-        self.transient(parent)
 
-        header = ctk.CTkFrame(self, fg_color="transparent")
-        header.pack(fill="x", padx=25, pady=(20, 10))
+        self.after(80, self._build)
 
+    def _build(self) -> None:
+        t = self.t
+        result = self._result
+
+        # Header
         ctk.CTkLabel(
-            header, text=t["res_title"], font=FONT_H1, text_color=FG_PRIMARY
-        ).pack(anchor="w")
+            self, text=t["res_title"], font=FONT_H1, text_color=FG_PRIMARY
+        ).pack(anchor="w", padx=25, pady=(20, 4))
 
         summary_color = SUCCESS if result.failed == 0 else WARNING
         ctk.CTkLabel(
-            header,
+            self,
             text=result.summary(),
             font=FONT_BODY,
             text_color=summary_color,
-        ).pack(anchor="w", pady=(4, 0))
+        ).pack(anchor="w", padx=25, pady=(0, 12))
 
-        scroll = ctk.CTkScrollableFrame(self, fg_color=BG_CARD)
-        scroll.pack(fill="both", expand=True, padx=25, pady=(10, 15))
+        # Results
+        scroll = ctk.CTkScrollableFrame(self, fg_color=BG_CARD, corner_radius=10)
+        scroll.pack(fill="both", expand=True, padx=25, pady=(0, 15))
 
         for res in result.results:
             color = SUCCESS if res.success else DANGER
@@ -252,11 +300,7 @@ class ResultsDialog(ctk.CTkToplevel):
             row.pack(fill="x", pady=2)
 
             ctk.CTkLabel(
-                row,
-                text="●",
-                font=FONT_BODY,
-                text_color=color,
-                width=20,
+                row, text="●", font=FONT_BODY, text_color=color, width=20
             ).pack(side="left", padx=(6, 6))
 
             ctk.CTkLabel(
@@ -275,6 +319,7 @@ class ResultsDialog(ctk.CTkToplevel):
                 anchor="e",
             ).pack(side="right", padx=8)
 
+        # Close
         ctk.CTkButton(
             self,
             text=t["res_close"],
@@ -284,7 +329,17 @@ class ResultsDialog(ctk.CTkToplevel):
             text_color=FG_PRIMARY,
             height=38,
             width=120,
+            corner_radius=8,
         ).pack(pady=(0, 20))
+
+        self.after(120, self._post_build)
+
+    def _post_build(self) -> None:
+        try:
+            self.grab_set()
+            self.focus_force()
+        except Exception:
+            pass
 
 
 # ============================================================
@@ -305,7 +360,6 @@ class BaseSection(ctk.CTkFrame):
         pass
 
     def refresh_texts(self) -> None:
-        """Rebuild the section when language changes."""
         for widget in self.winfo_children():
             widget.destroy()
         self.t = self.app.t
@@ -373,19 +427,16 @@ class DebloaterSection(BaseSection):
     def build(self) -> None:
         t = self.t
 
-        # Title
         ctk.CTkLabel(
             self, text=t["deb_title"], font=FONT_H1, text_color=FG_PRIMARY
         ).pack(anchor="w", pady=(0, 15))
 
-        # Controls card
         controls = ctk.CTkFrame(self, fg_color=BG_CARD, corner_radius=12)
         controls.pack(fill="x", pady=(0, 15))
 
         inner = ctk.CTkFrame(controls, fg_color="transparent")
         inner.pack(fill="x", padx=20, pady=15)
 
-        # Level
         ctk.CTkLabel(
             inner, text=t["deb_level"], font=FONT_H3, text_color=FG_SECONDARY
         ).grid(row=0, column=0, padx=(0, 8), sticky="w")
@@ -396,7 +447,9 @@ class DebloaterSection(BaseSection):
         }
         self.level_reverse = {v: k for k, v in level_display.items()}
         self.level_var = tk.StringVar(
-            value=self.level_reverse.get(self.app.config["last_level"], t["deb_level_light"])
+            value=self.level_reverse.get(
+                self.app.config["last_level"], t["deb_level_light"]
+            )
         )
         ctk.CTkOptionMenu(
             inner,
@@ -411,7 +464,6 @@ class DebloaterSection(BaseSection):
             width=200,
         ).grid(row=0, column=1, padx=(0, 25), sticky="w")
 
-        # Action
         ctk.CTkLabel(
             inner, text=t["deb_action"], font=FONT_H3, text_color=FG_SECONDARY
         ).grid(row=0, column=2, padx=(0, 8), sticky="w")
@@ -422,7 +474,9 @@ class DebloaterSection(BaseSection):
         }
         self.action_reverse = {v: k for k, v in action_display.items()}
         self.action_var = tk.StringVar(
-            value=self.action_reverse.get(self.app.config["last_action"], t["deb_action_uninstall"])
+            value=self.action_reverse.get(
+                self.app.config["last_action"], t["deb_action_uninstall"]
+            )
         )
         ctk.CTkOptionMenu(
             inner,
@@ -437,7 +491,6 @@ class DebloaterSection(BaseSection):
             width=160,
         ).grid(row=0, column=3, padx=(0, 25), sticky="w")
 
-        # Buttons
         ctk.CTkButton(
             inner,
             text=t["deb_select_all"],
@@ -462,7 +515,6 @@ class DebloaterSection(BaseSection):
             corner_radius=8,
         ).grid(row=0, column=5, padx=(0, 25))
 
-        # Dry-run switch
         self.dry_run_var = tk.BooleanVar(value=self.app.config["dry_run"])
         ctk.CTkSwitch(
             inner,
@@ -476,7 +528,6 @@ class DebloaterSection(BaseSection):
 
         inner.grid_columnconfigure(7, weight=1)
 
-        # Package list
         self.scroll = ctk.CTkScrollableFrame(
             self, fg_color=BG_CARD, corner_radius=12, height=280
         )
@@ -487,7 +538,6 @@ class DebloaterSection(BaseSection):
 
         self._populate_packages()
 
-        # Bottom action bar
         bottom = ctk.CTkFrame(self, fg_color="transparent")
         bottom.pack(fill="x")
 
@@ -510,8 +560,6 @@ class DebloaterSection(BaseSection):
             font=FONT_H3,
         ).pack(side="right")
 
-    # -------------------------------------------------------
-
     def _on_level_change(self) -> None:
         self.app.config["last_level"] = self._current_level()
         save_config(self.app.config)
@@ -530,8 +578,6 @@ class DebloaterSection(BaseSection):
 
     def _current_action(self) -> str:
         return self.action_reverse.get(self.action_var.get(), "uninstall")
-
-    # -------------------------------------------------------
 
     def _populate_packages(self) -> None:
         for widget in self.scroll.winfo_children():
@@ -589,8 +635,6 @@ class DebloaterSection(BaseSection):
     def _get_selected(self) -> list[str]:
         return [pkg for pkg, var in self.package_vars.items() if var.get()]
 
-    # -------------------------------------------------------
-
     def _run(self) -> None:
         selected = self._get_selected()
         if not selected:
@@ -621,7 +665,9 @@ class DebloaterSection(BaseSection):
     ) -> None:
         if not dry_run:
             try:
-                backup_path = create_backup(packages, self.app.device_info, action.value)
+                backup_path = create_backup(
+                    packages, self.app.device_info, action.value
+                )
                 self.app.set_status(
                     self.t["status_backup_saved"].format(name=backup_path.name)
                 )
@@ -673,7 +719,6 @@ class PackagesSection(BaseSection):
             self, text=t["pkg_title"], font=FONT_H1, text_color=FG_PRIMARY
         ).pack(anchor="w", pady=(0, 15))
 
-        # Warning banner based on force mode
         force_on = bool(self.app.config.get("force_mode", False))
         if force_on:
             banner_bg = "#3a1e1e"
@@ -695,7 +740,6 @@ class PackagesSection(BaseSection):
             justify="left",
         ).pack(padx=15, pady=10, anchor="w")
 
-        # Search / filter bar
         bar = ctk.CTkFrame(self, fg_color=BG_CARD, corner_radius=12)
         bar.pack(fill="x", pady=(0, 15))
 
@@ -719,7 +763,11 @@ class PackagesSection(BaseSection):
         self.filter_var = tk.StringVar(value=t["pkg_filter_all"])
         ctk.CTkOptionMenu(
             bar_inner,
-            values=[t["pkg_filter_all"], t["pkg_filter_enabled"], t["pkg_filter_disabled"]],
+            values=[
+                t["pkg_filter_all"],
+                t["pkg_filter_enabled"],
+                t["pkg_filter_disabled"],
+            ],
             variable=self.filter_var,
             command=lambda _: self._render_packages(),
             fg_color=BG_INPUT,
@@ -754,7 +802,6 @@ class PackagesSection(BaseSection):
             corner_radius=8,
         ).pack(side="right")
 
-        # Package list
         self.scroll = ctk.CTkScrollableFrame(self, fg_color=BG_CARD, corner_radius=12)
         self.scroll.pack(fill="both", expand=True, pady=(0, 10))
 
@@ -820,7 +867,10 @@ class PackagesSection(BaseSection):
         filter_mode = self.filter_var.get()
 
         force_on = bool(self.app.config.get("force_mode", False))
-        blacklist = {p["package"] for p in get_packages_by_level(self.app.bloatware, "blacklist")}
+        blacklist = {
+            p["package"]
+            for p in get_packages_by_level(self.app.bloatware, "blacklist")
+        }
         curated = {
             p["package"]
             for lvl in ("light", "aggressive")
@@ -932,7 +982,6 @@ class PackagesSection(BaseSection):
     def _execute(
         self, packages: list[str], action: Action, dry_run: bool, serial: str
     ) -> None:
-        # In this section, dry-run can be off via config, but we always backup.
         if not dry_run:
             try:
                 create_backup(packages, self.app.device_info, action.value)
@@ -1114,7 +1163,9 @@ class SettingsSection(BaseSection):
         ).pack(side="left")
 
         self.theme_var = tk.StringVar(
-            value=t["set_theme_dark"] if self.app.config["theme"] == "dark" else t["set_theme_light"]
+            value=t["set_theme_dark"]
+            if self.app.config["theme"] == "dark"
+            else t["set_theme_light"]
         )
         ctk.CTkOptionMenu(
             inner2,
@@ -1190,7 +1241,9 @@ class SettingsSection(BaseSection):
         self.app.apply_language()
 
     def _change_theme(self) -> None:
-        new_theme = "dark" if self.theme_var.get() == self.t["set_theme_dark"] else "light"
+        new_theme = (
+            "dark" if self.theme_var.get() == self.t["set_theme_dark"] else "light"
+        )
         self.app.config["theme"] = new_theme
         save_config(self.app.config)
         ctk.set_appearance_mode(new_theme)
@@ -1255,8 +1308,6 @@ class OPlusToolkitApp(ctk.CTk):
 
         self.after(200, self.refresh_device_info)
 
-    # -------------------------------------------------------
-
     def _build_sidebar(self) -> None:
         self.sidebar = ctk.CTkFrame(
             self, width=230, corner_radius=0, fg_color=BG_SIDEBAR
@@ -1316,8 +1367,6 @@ class OPlusToolkitApp(ctk.CTk):
             anchor="w",
         ).pack(fill="x", padx=20)
 
-    # -------------------------------------------------------
-
     def show_section(self, key: str) -> None:
         if key == self.current_section:
             self.sections[key].on_show()
@@ -1340,11 +1389,9 @@ class OPlusToolkitApp(ctk.CTk):
         self.t = I18N[self.config["language"]]
         self.title(self.t["app_title"])
 
-        # Update sidebar nav buttons
         for key, btn in self.nav_buttons.items():
             btn.configure(text="  " + self.t[f"nav_{key}"])
 
-        # Rebuild each section
         for section in self.sections.values():
             section.refresh_texts()
 
@@ -1361,8 +1408,6 @@ class OPlusToolkitApp(ctk.CTk):
         self.logger.info(result.summary())
         for res in result.results:
             self.logger.info(str(res))
-
-    # -------------------------------------------------------
 
     def refresh_device_info(self) -> None:
         def worker() -> None:
@@ -1405,8 +1450,6 @@ class OPlusToolkitApp(ctk.CTk):
             self.refresh_device_info()
 
         threading.Thread(target=worker, daemon=True).start()
-
-    # -------------------------------------------------------
 
     def _on_close(self) -> None:
         self.config["window_geometry"] = self.geometry()

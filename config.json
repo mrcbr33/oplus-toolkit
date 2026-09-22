@@ -5,5 +5,5 @@
   "last_action": "uninstall",
   "dry_run": true,
   "force_mode": false,
-  "window_geometry": "1200x780"
+  "window_geometry": "1200x780+206+436"
 }
